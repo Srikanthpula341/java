@@ -1,89 +1,222 @@
-# Spring Boot Pair Programming Problems
+# Spring Boot Learning Tasks Documentation
 
-## Spring Boot Core Problems
-1. **Spring Boot CRUD API**
-    - Build a simple REST API with CRUD operations using Spring Boot, Spring Data JPA, and MySQL/PostgreSQL.
+## Task 1: Spring Boot CRUD API
+**Package**: `task1_crud`
+**Base URL**: `/task1`
+- Implementation of basic CRUD operations
+- Entity design and relationships
+- Repository layer implementation
+- Service layer business logic
+- REST controller endpoints
+- Documentation & Testing
 
-2. **Spring Boot Exception Handling**
-    - Implement global exception handling using `@ControllerAdvice` and `@ExceptionHandler`.
+## Task 2: Spring Boot Exception Handling
+**Package**: `task2_exception`
+**Base URL**: `/task2`
+- Global exception handling setup
+- Custom exceptions
+- Error response structure
+- Exception handling best practices
+- Documentation & Testing examples
 
-3. **Spring Boot Pagination & Sorting**
-    - Implement pagination and sorting in a REST API using `Pageable`.
+## Task 3: Spring Boot Pagination & Sorting
+**Package**: `task3_pagination`
+**Base URL**: `/task3`
+- Pageable implementation
+- Sorting configurations
+- Custom page responses
+- API documentation with examples
+- Performance considerations
 
-4. **Spring Boot Validation**
-    - Validate incoming request data using `@Valid` and `@NotNull` annotations.
+## Task 4: Spring Boot Validation
+**Package**: `task4_validation`
+- Request validation implementation
+- Custom validation annotations
+- Validation groups
+- Error message handling
+- Documentation with examples
 
-5. **Spring Boot Configuration Properties**
-    - Use `@ConfigurationProperties` to load properties from `application.yml`.
+## Task 5: Spring Boot Configuration Properties
+**Package**: `task5_config`
+- YAML configuration setup
+- Custom property classes
+- Configuration management
+- Environment-specific configs
+- Documentation & Usage examples
+
+## Task 6: Spring Boot Security with JWT
+**Package**: `task6_jwt`
+- JWT implementation
+- Authentication flow
+- Token management
+- Security configurations
+- API documentation & Testing
+
+## Task 7: Spring Boot OAuth2 Authentication
+**Package**: `task7_oauth`
+- Google OAuth2 setup
+- Authentication flow
+- User registration process
+- Security configurations
+- Documentation & Examples
+
+## Task 8: Role-Based Access Control
+**Package**: `task8_rbac`
+- Role management
+- Permission setup
+- Access control implementation
+- Security configurations
+- Documentation & Testing
+
+## Task 9: Spring Boot Session Management
+**Package**: `task9_session`
+- Redis session setup
+- Session management
+- Security configurations
+- Best practices
+- Documentation & Examples
+
+## Task 10: Database Authentication
+**Package**: `task10_db_auth`
+- Database schema design
+- Authentication implementation
+- Password encryption
+- Security best practices
+- Documentation & Testing
+
+## Task 11: Feign Client Implementation
+**Package**: `task11_feign`
+- Feign client setup
+- API integration
+- Error handling
+- Configuration
+- Documentation & Examples
+
+## Task 12: WebSockets Chat Application
+**Package**: `task12_websocket`
+- WebSocket configuration
+- Chat functionality
+- Message handling
+- Client implementation
+- Documentation & Testing
+
+## Task 13: Kafka Implementation
+**Package**: `task13_kafka`
+- Kafka setup
+- Producer implementation
+- Consumer implementation
+- Error handling
+- Documentation & Examples
+
+## Task 14: RabbitMQ Integration
+**Package**: `task14_rabbitmq`
+- RabbitMQ setup
+- Queue management
+- Message handling
+- Error handling
+- Documentation & Testing
+
+## Task 15: OpenFeign Implementation
+**Package**: `task15_openfeign`
+- OpenFeign setup
+- API integration
+- Error handling
+- Configuration
+- Documentation & Examples
+
+## Task 16: One-to-Many Relationship
+**Package**: `task16_onetomany`
+- Entity relationships
+- Database design
+- CRUD operations
+- Best practices
+- Documentation & Examples
+
+## Task 17: Many-to-Many Relationship
+**Package**: `task17_manytomany`
+- Entity relationships
+- Database design
+- CRUD operations
+- Best practices
+- Documentation & Examples
+
+## Task 18: Redis Caching
+**Package**: `task18_redis`
+- Redis setup
+- Cache configuration
+- Cache management
+- Performance testing
+- Documentation & Examples
+
+## Task 19: Database Connection Pooling
+**Package**: `task19_connection_pool`
+- HikariCP setup
+- Pool configuration
+- Performance tuning
+- Monitoring
+- Documentation & Examples
+
+## Task 20: Database Migration
+**Package**: `task20_migration`
+- Flyway/Liquibase setup
+- Migration scripts
+- Version management
+- Best practices
+- Documentation & Examples
+
+## Task 21: Testing Implementation
+**Package**: `task21_testing`
+- Unit tests
+- Integration tests
+- Test configurations
+- Mockito usage
+- Documentation & Examples
+
+## Task 22: TestContainers
+**Package**: `task22_testcontainers`
+- Container setup
+- Database testing
+- Integration testing
+- Best practices
+- Documentation & Examples
+
+## Task 23: Actuator & Health Checks
+**Package**: `task23_actuator`
+- Actuator setup
+- Custom endpoints
+- Health indicators
+- Monitoring
+- Documentation & Examples
+
+## Task 24: Logging Implementation
+**Package**: `task24_logging`
+- Logback configuration
+- SLF4J implementation
+- Log management
+- Best practices
+- Documentation & Examples
+
+## Task 25: Metrics Implementation
+**Package**: `task25_metrics`
+**Base URL**: `/task25`
+- Prometheus setup
+- Grafana integration
+- Metrics collection
+- Dashboard setup
+- Documentation & Examples
 
 ---
 
-## Spring Boot Security & Authentication
-6. **Spring Boot Security with JWT**
-    - Secure a REST API using JWT authentication.
+Each task package includes:
+1. Complete source code
+2. Documentation folder with:
+   - README.md (Overview & Setup)
+   - workflow.md (Implementation steps)
+   - api-docs.md (API documentation)
+   - Additional task-specific documentation
 
-7. **Spring Boot OAuth2 Authentication**
-    - Implement Google login using OAuth2.
-
-8. **Role-Based Access Control (RBAC)**
-    - Restrict access to specific API endpoints based on user roles.
-
-9. **Spring Boot Session Management**
-    - Implement session-based authentication with Redis.
-
-10. **Spring Security with Database Authentication**
-    - Authenticate users with credentials stored in a database using Spring Security.
-
----
-
-## Spring Boot Integration & Communication
-11. **Spring Boot REST API with Feign Client**
-    - Call an external REST API using Feign Client.
-
-12. **Spring Boot WebSockets**
-    - Implement a real-time chat application using WebSockets.
-
-13. **Spring Boot Kafka Producer & Consumer**
-    - Implement a Kafka producer and consumer for messaging.
-
-14. **Spring Boot RabbitMQ Integration**
-    - Send and receive messages using RabbitMQ.
-
-15. **Spring Boot REST API with OpenFeign**
-    - Use OpenFeign to consume an external REST API.
-
----
-
-## Spring Boot Database & Caching
-16. **Spring Boot Hibernate One-to-Many Relationship**
-    - Implement a one-to-many relationship between two entities (e.g., User and Orders).
-
-17. **Spring Boot Hibernate Many-to-Many Relationship**
-    - Implement a many-to-many relationship (e.g., Students and Courses).
-
-18. **Spring Boot Caching with Redis**
-    - Use `@Cacheable` to cache API responses using Redis.
-
-19. **Spring Boot Database Connection Pooling**
-    - Configure HikariCP connection pooling for database performance optimization.
-
-20. **Spring Boot Flyway/Liquibase Migration**
-    - Implement database versioning with Flyway or Liquibase.
-
----
-
-## Spring Boot Testing & Monitoring
-21. **Spring Boot Unit & Integration Testing**
-    - Write unit tests using JUnit and Mockito.
-
-22. **Spring Boot TestContainers**
-    - Use TestContainers to test Spring Boot applications with a real database in a Docker container.
-
-23. **Spring Boot Actuator & Custom Health Checks**
-    - Expose custom health check endpoints using Spring Boot Actuator.
-
-24. **Spring Boot Logging with Logback & SLF4J**
-    - Configure application logs using Logback and SLF4J.
-
-25. **Spring Boot Metrics with Prometheus & Grafana**
-    - Monitor application metrics using Prometheus and visualize them in Grafana.
+## API Structure
+- Each task has its own base URL (e.g., `/task1`, `/task2`, etc.)
+- All API endpoints for a specific task are grouped under its base URL
+- Base URLs are defined in `ApiConstants.java`
+- Consistent URL pattern across all tasks for better organization
