@@ -1,0 +1,34 @@
+app:
+  name: Spring Boot Learning
+  description: A comprehensive Spring Boot learning project
+  version: 1.0.0
+  
+  email:
+    from: noreply@example.com
+    support-email: support@example.com
+    enabled: true
+    max-retries: 3
+  
+  security:
+    api-key: ${API_KEY:default-api-key}
+    token-validity-in-seconds: 86400
+    ssl-enabled: true
+    cors:
+      enabled: true
+      allowed-origins:
+        - http://localhost:3000
+        - http://localhost:4200
+      allowed-methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+  
+  cache:
+    enabled: true
+    timeout-in-seconds: 3600
+    max-size: 100
+
+  jwt:
+    secret: your-very-very-very-very-very-very-very-very-very-very-very-long-secret
+    expiration: 86400000 # 24 hours in milliseconds 
