@@ -1,78 +1,85 @@
-import { useEffect, useState } from "react";
-import { useAxios } from "../hooks/useAxios";
+import React, { useRef } from "react";
+import { useUploadEligibilityFile } from "../hooks/useUploadEligibilityFile";
+import { useFetchEligibilityFiles } from "../hooks/useFetchEligibilityFiles";
 
-export interface EligibilityFile {
-  id: number;
-  fileName: string;
-  totalRecords: number;
-  associationExist: string;
-  associationCreated: string;
-  planCreated: string;
-  errors: number;
-  errorDetails: string[];
-  uploadDate: string;
-  uploadedBy: string;
-  status: string;
-}
+const EligibilityFilePage: React.FC = () => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { upload, uploading, error: uploadError } = useUploadEligibilityFile();
+  const { files, loading, error: listError, refresh } = useFetchEligibilityFiles();
 
-const FILE_LIST_URL = "/api/eligibility/files";
-
-export const useFetchEligibilityFiles = () => {
-  const axios = useAxios();
-  const [files, setFiles] = useState<EligibilityFile[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchList = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await axios.get<EligibilityFile[]>(FILE_LIST_URL);
-      setFiles(response.data);
-    } catch {
-      setError("Failed to fetch files");
-    } finally {
-      setLoading(false);
-    }
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
   };
 
-  useEffect(() => {
-    fetchList();
-  }, []);
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-  return { files, loading, error, refresh: fetchList };
-};
-import { useState } from "react";
-import { useAxios } from "../hooks/useAxios";
+    const isTxt = file.name.endsWith(".txt");
+    const isValidSize = file.size <= 1024 * 1024;
 
-const FILE_UPLOAD_URL = "/api/eligibility/upload";
-
-export const useUploadEligibilityFile = () => {
-  const axios = useAxios();
-  const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const upload = async (key: string, file: File): Promise<boolean> => {
-    const formData = new FormData();
-    formData.append(key, file);
-
-    try {
-      setUploading(true);
-      setError(null);
-
-      await axios.post(FILE_UPLOAD_URL, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      return true;
-    } catch {
-      setError("Upload failed");
-      return false;
-    } finally {
-      setUploading(false);
+    if (!isTxt || !isValidSize) {
+      alert("Only .txt files under 1MB are allowed.");
+      fileInputRef.current!.value = "";
+      return;
     }
+
+    const success = await upload("uploadFile", file);
+    if (success) await refresh();
+
+    fileInputRef.current!.value = "";
   };
 
-  return { upload, uploading, error };
+  return (
+    <div style={{ padding: "1rem" }}>
+      <h2>Eligibility File Upload</h2>
+
+      <button onClick={handleUploadClick} disabled={uploading}>
+        {uploading ? "Uploading..." : "Upload File"}
+      </button>
+
+      <input
+        type="file"
+        ref={fileInputRef}
+        accept=".txt"
+        onChange={handleFileSelect}
+        style={{ display: "none" }}
+      />
+
+      {uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
+      {listError && <p style={{ color: "red" }}>{listError}</p>}
+
+      <h3>Uploaded Files</h3>
+      {loading ? (
+        <p>Loading files...</p>
+      ) : (
+        <table border={1} cellPadding={5}>
+          <thead>
+            <tr>
+              <th>File Name</th>
+              <th>Uploaded By</th>
+              <th>Upload Date</th>
+              <th>Status</th>
+              <th>Total Records</th>
+              <th>Errors</th>
+            </tr>
+          </thead>
+          <tbody>
+            {files.map((file) => (
+              <tr key={file.id}>
+                <td>{file.fileName}</td>
+                <td>{file.uploadedBy}</td>
+                <td>{file.uploadDate}</td>
+                <td>{file.status}</td>
+                <td>{file.totalRecords}</td>
+                <td>{file.errors}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
 };
+
+export default EligibilityFilePage;
