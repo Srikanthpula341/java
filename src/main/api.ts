@@ -1,77 +1,78 @@
-import { useState, useCallback } from "react";
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import { useEffect, useState } from "react";
+import { useAxios } from "../hooks/useAxios";
 
-type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
-
-interface UseApiRequestResult<T = any> {
-  responseData: T | null;
-  isLoading: boolean;
-  error: any;
-  sendRequest: (
-    endpoint: string,
-    method?: HttpMethod,
-    options?: {
-      queryParams?: Record<string, any>;
-      body?: any;
-      config?: AxiosRequestConfig;
-    }
-  ) => Promise<T | null>;
+export interface EligibilityFile {
+  id: number;
+  fileName: string;
+  totalRecords: number;
+  associationExist: string;
+  associationCreated: string;
+  planCreated: string;
+  errors: number;
+  errorDetails: string[];
+  uploadDate: string;
+  uploadedBy: string;
+  status: string;
 }
 
-const BASE_API_URL = "https://your-backend-domain.com"; // Replace or load from env
+const FILE_LIST_URL = "/api/eligibility/files";
 
-export const useApiRequest = <T = any>(): UseApiRequestResult<T> => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [responseData, setResponseData] = useState<T | null>(null);
-  const [error, setError] = useState<any>(null);
+export const useFetchEligibilityFiles = () => {
+  const axios = useAxios();
+  const [files, setFiles] = useState<EligibilityFile[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const sendRequest = useCallback(
-    async (
-      endpoint: string,
-      method: HttpMethod = "GET",
-      options?: {
-        queryParams?: Record<string, any>;
-        body?: any;
-        config?: AxiosRequestConfig;
-      }
-    ): Promise<T | null> => {
-      setIsLoading(true);
+  const fetchList = async () => {
+    try {
+      setLoading(true);
       setError(null);
-      setResponseData(null);
 
-      try {
-        const url = `${BASE_API_URL}${endpoint}`;
-
-        const axiosConfig: AxiosRequestConfig = {
-          method,
-          url,
-          ...options?.config,
-        };
-
-        if (method === "GET" || method === "DELETE") {
-          axiosConfig.params = options?.queryParams;
-        } else {
-          axiosConfig.data = options?.body;
-          axiosConfig.params = options?.queryParams;
-        }
-
-        const response: AxiosResponse<T> = await axios(axiosConfig);
-        setResponseData(response.data);
-        return response.data;
-      } catch (err) {
-        setError(err);
-        return null;
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    []
-  );
-
-  return {
-    sendRequest,
-    responseData,
-    isLoading,
-    error
+      const response = await axios.get<EligibilityFile[]>(FILE_LIST_URL);
+      setFiles(response.data);
+    } catch {
+      setError("Failed to fetch files");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchList();
+  }, []);
+
+  return { files, loading, error, refresh: fetchList };
+};
+import { useState } from "react";
+import { useAxios } from "../hooks/useAxios";
+
+const FILE_UPLOAD_URL = "/api/eligibility/upload";
+
+export const useUploadEligibilityFile = () => {
+  const axios = useAxios();
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const upload = async (key: string, file: File): Promise<boolean> => {
+    const formData = new FormData();
+    formData.append(key, file);
+
+    try {
+      setUploading(true);
+      setError(null);
+
+      await axios.post(FILE_UPLOAD_URL, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      return true;
+    } catch {
+      setError("Upload failed");
+      return false;
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return { upload, uploading, error };
 };
