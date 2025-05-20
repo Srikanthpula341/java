@@ -1,28 +1,26 @@
-import React from 'react';
-import { render } from '@testing-library/react';
-import Eligibility from './Eligibility';
-import * as SharedComponents from '@optum-meteor/shared-components';
+import { getTodayDate } from './helpers';
 
-// Mock the AxiosProvider to observe usage
-jest.mock('@optum-meteor/shared-components', () => ({
-  AxiosProvider: ({ children, baseUrl }: any) => (
-    <div data-testid="axios-provider" data-baseurl={baseUrl}>
-      {children}
-    </div>
-  ),
-}));
+describe('getTodayDate', () => {
+  it('should return date in MM/DD/YYYY format', () => {
+    const date = new Date();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    const expected = `${mm}/${dd}/${yyyy}`;
 
-// Mock the EligibilityPage component
-jest.mock('./EligibilityFiles', () => () => (
-  <div data-testid="eligibility-page">Mocked EligibilityPage</div>
-));
+    expect(getTodayDate()).toBe(expected);
+  });
+});
+import { isvalidFileType, ALLOWED_FILE_TYPES } from './fileValidator';
 
-describe('Eligibility Component', () => {
-  it('renders AxiosProvider and EligibilityPage', () => {
-    const { getByTestId } = render(<Eligibility />);
+describe('fileValidator.ts', () => {
+  it('should return true for valid file type', () => {
+    const file = new File(['dummy'], 'test.txt', { type: 'text/plain' });
+    expect(isvalidFileType(file, ALLOWED_FILE_TYPES)).toBe(true);
+  });
 
-    expect(getByTestId('axios-provider')).toBeInTheDocument();
-    expect(getByTestId('eligibility-page')).toBeInTheDocument();
-    expect(getByTestId('axios-provider')).toHaveAttribute('data-baseurl', '');
+  it('should return false for invalid file type', () => {
+    const file = new File(['dummy'], 'test.pdf', { type: 'application/pdf' });
+    expect(isvalidFileType(file, ALLOWED_FILE_TYPES)).toBe(false);
   });
 });
