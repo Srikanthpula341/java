@@ -1,63 +1,76 @@
-import {
-    validateTextFile,
-    isvalidFileType,
-    ALLOWED_FILE_TYPES
-  } from './fileValidator';
-  
-  import aemContent from '../aemContent.json';
-  
-  describe('validateTextFile', () => {
-    const maxSize = 1000;
-  
-    it('should return fileSizeError if file size exceeds maxSize', async () => {
-      const file = new File(['x'.repeat(maxSize + 1)], 'large.txt', {
-        type: 'text/plain',
-      });
-      Object.defineProperty(file, 'size', { value: maxSize + 1 });
-  
-      const result = await validateTextFile(file, maxSize);
-      expect(result).toBe(aemContent.fileSizeError);
-    });
-  
-    it('should return fileTypeError if file type is not text/plain', async () => {
-      const file = new File(['test content'], 'invalid.csv', {
-        type: 'text/csv',
-      });
-  
-      const result = await validateTextFile(file, maxSize);
-      expect(result).toBe(aemContent.fileTypeError);
-    });
-  
-    it('should return fileDelimitError if file does not contain delimiter |', async () => {
-      const file = new File(['no delimiter here'], 'test.txt', {
-        type: 'text/plain',
-      });
-  
-      const result = await validateTextFile(file, maxSize);
-      expect(result).toBe(aemContent.fileDelimitError);
-    });
-  
-    it('should return null if file is valid and contains delimiter', async () => {
-      const file = new File(['valid|file'], 'test.txt', {
-        type: 'text/plain',
-      });
-  
-      const result = await validateTextFile(file, maxSize);
-      expect(result).toBeNull(); // Line `return null;`
-    });
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom';
+import EligbilityPage from './index';
+
+// Mock validator and uploader
+jest.mock('../../utils/fileValidator', () => ({
+  validateTextFile: jest.fn(),
+}));
+
+jest.mock('../../hooks/uploadEligibilityFile', () => ({
+  uploadEligibilityFile: jest.fn(),
+}));
+
+describe('EligbilityPage Component', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
-  
-  describe('isvalidFileType', () => {
-    it('should return true for valid MIME type', () => {
-      const file = new File(['dummy'], 'valid.txt', { type: 'text/plain' });
-      const result = isvalidFileType(file, ALLOWED_FILE_TYPES);
-      expect(result).toBe(true); // Line `return allowedTypes.includes(file.type);`
+
+  it('should trigger file download when clicking Download Template', () => {
+    const clickSpy = jest.fn();
+    const appendChildSpy = jest.spyOn(document.body, 'appendChild');
+    const removeChildSpy = jest.spyOn(document.body, 'removeChild');
+
+    jest.spyOn(document, 'createElement').mockImplementation(() => {
+      return {
+        href: '',
+        download: '',
+        click: clickSpy,
+        setAttribute: jest.fn(),
+      } as unknown as HTMLAnchorElement;
     });
-  
-    it('should return false for invalid MIME type', () => {
-      const file = new File(['dummy'], 'invalid.csv', { type: 'text/csv' });
-      const result = isvalidFileType(file, ALLOWED_FILE_TYPES);
-      expect(result).toBe(false);
-    });
+
+    render(<EligbilityPage />);
+
+    const downloadButton = screen.getByRole('button', { name: /download/i });
+    userEvent.click(downloadButton);
+
+    expect(clickSpy).toHaveBeenCalled();
+    expect(appendChildSpy).toHaveBeenCalled();
+    expect(removeChildSpy).toHaveBeenCalled();
   });
-  
+
+  it('should show error if file validation fails', async () => {
+    const { validateTextFile } = require('../../utils/fileValidator');
+    validateTextFile.mockResolvedValue('Invalid file');
+
+    render(<EligbilityPage />);
+
+    const file = new File(['invalid content'], 'test.txt', { type: 'text/plain' });
+
+    const fileInput = screen.getByTestId('file-input');
+    fireEvent.change(fileInput, { target: { files: [file] } });
+
+    expect(await screen.findByText('Invalid file')).toBeInTheDocument();
+  });
+
+  it('should upload file if validation passes', async () => {
+    const { validateTextFile } = require('../../utils/fileValidator');
+    const { uploadEligibilityFile } = require('../../hooks/uploadEligibilityFile');
+
+    validateTextFile.mockResolvedValue(null);
+    uploadEligibilityFile.mockResolvedValue({ success: true });
+
+    render(<EligbilityPage />);
+
+    const file = new File(['valid|file'], 'valid.txt', { type: 'text/plain' });
+
+    const fileInput = screen.getByTestId('file-input');
+    fireEvent.change(fileInput, { target: { files: [file] } });
+
+    expect(validateTextFile).toHaveBeenCalledWith(file, expect.any(Number));
+    expect(uploadEligibilityFile).toHaveBeenCalledWith(expect.anything(), 'file', file);
+  });
+});
