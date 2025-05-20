@@ -1,26 +1,31 @@
-import { getTodayDate } from './helpers';
+import { validateTextFile } from './fileValidator';
+import aemContent from '../aemContent.json';
 
-describe('getTodayDate', () => {
-  it('should return date in MM/DD/YYYY format', () => {
-    const date = new Date();
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const dd = String(date.getDate()).padStart(2, '0');
-    const yyyy = date.getFullYear();
-    const expected = `${mm}/${dd}/${yyyy}`;
+describe('validateTextFile', () => {
+  const maxSize = 1000;
 
-    expect(getTodayDate()).toBe(expected);
-  });
-});
-import { isvalidFileType, ALLOWED_FILE_TYPES } from './fileValidator';
-
-describe('fileValidator.ts', () => {
-  it('should return true for valid file type', () => {
-    const file = new File(['dummy'], 'test.txt', { type: 'text/plain' });
-    expect(isvalidFileType(file, ALLOWED_FILE_TYPES)).toBe(true);
+  it('should return size error if file exceeds max size', async () => {
+    const file = new File(['x'.repeat(maxSize + 1)], 'test.txt', { type: 'text/plain' });
+    Object.defineProperty(file, 'size', { value: maxSize + 1 });
+    const result = await validateTextFile(file, maxSize);
+    expect(result).toBe(aemContent.fileSizeError);
   });
 
-  it('should return false for invalid file type', () => {
-    const file = new File(['dummy'], 'test.pdf', { type: 'application/pdf' });
-    expect(isvalidFileType(file, ALLOWED_FILE_TYPES)).toBe(false);
+  it('should return type error if file is not text/plain', async () => {
+    const file = new File(['dummy content'], 'test.csv', { type: 'text/csv' });
+    const result = await validateTextFile(file, maxSize);
+    expect(result).toBe(aemContent.fileTypeError);
+  });
+
+  it('should return delimiter error if file content does not contain "|"', async () => {
+    const file = new File(['no-delimiter'], 'test.txt', { type: 'text/plain' });
+    const result = await validateTextFile(file, maxSize);
+    expect(result).toBe(aemContent.fileDelimitError);
+  });
+
+  it('should return null for valid file', async () => {
+    const file = new File(['abc|def'], 'test.txt', { type: 'text/plain' });
+    const result = await validateTextFile(file, maxSize);
+    expect(result).toBeNull();
   });
 });
